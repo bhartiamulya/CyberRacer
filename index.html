@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Racing Car Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="ui-overlay">
+            <div class="hud-top">
+                <div class="score">Score: <span id="score">0</span></div>
+                <div class="combo">Combo: <span id="combo">0</span>x</div>
+                <div class="speed">Speed: <span id="speed">0</span> mph</div>
+            </div>
+            <div class="hud-bottom">
+                <div class="health-bar">
+                    <div class="health-fill" id="healthFill"></div>
+                    <span class="health-text">ARMOR</span>
+                </div>
+                <div class="weapon-info">
+                    <span id="weaponType">BLASTER</span>
+                    <div class="ammo">∞</div>
+                </div>
+                <div class="power-ups" id="powerUps"></div>
+            </div>
+            <div class="game-over" id="gameOver">
+                <h2>🏁 Game Over! 🏁</h2>
+                <p>Final Score: <span id="finalScore">0</span></p>
+                <p>Max Speed Reached: <span id="maxSpeed">0</span> mph</p>
+                <div class="game-options">
+                    <h3>🎮 What's Next?</h3>
+                    <div class="button-group">
+                        <button onclick="restartGame()" class="primary-btn">🔄 Play Again</button>
+                        <button onclick="showGameMenu()" class="secondary-btn">🎯 Other Games</button>
+                    </div>
+                </div>
+            </div>
+            <div class="game-menu" id="gameMenu">
+                <h2>Game Modes</h2>
+                <div class="games-grid">
+                    <div class="game-card active" onclick="selectGameMode('speed')">
+                        <div class="game-icon">🏎️</div>
+                        <h3>Speed Demon</h3>
+                        <p>Pure speed racing - no combat</p>
+                    </div>
+                    <div class="game-card" onclick="selectGameMode('combat')">
+                        <div class="game-icon">🛡️</div>
+                        <h3>Tank Crusher</h3>
+                        <p>Combat racing with shooting</p>
+                    </div>
+                </div>
+                <button onclick="backToRacing()" class="back-btn">← Back to Racing</button>
+            </div>
+            <div class="start-screen" id="startScreen">
+                <h1>CYBER RACER</h1>
+                <div class="car-selection">
+                    <h3>Choose Your Ride:</h3>
+                    <div class="car-options">
+                        <button class="car-btn active" data-car="0">SPEED DEMON</button>
+                        <button class="car-btn" data-car="1">TANK CRUSHER</button>
+                    </div>
+                </div>
+                <button onclick="startGame()">Start Game</button>
+            </div>
+        </div>
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>
