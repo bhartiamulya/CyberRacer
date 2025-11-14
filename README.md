@@ -8,27 +8,6 @@ A browser-based racing game with two distinct game modes: pure speed racing and 
 - **Speed Demon**: Pure racing focused on speed and dodging
 - **Tank Crusher**: Combat racing with shooting mechanics
 
-### Core Gameplay
-- Smooth car controls (WASD/Arrow keys)
-- Dynamic enemy spawning with increasing difficulty
-- Real-time collision detection
-- Progressive speed milestones
-- Health system with visual feedback
-- Combo scoring system
-
-### Visual Effects
-- Particle systems for explosions and exhaust trails
-- Screen shake effects
-- Gradient backgrounds with animated starfield
-- Glowing UI elements with cyberpunk aesthetic
-- Real-time health bars and damage indicators
-
-### Audio System
-- Procedural sound effects using Web Audio API
-- Shooting, explosion, and impact sounds
-- Power-up collection audio feedback
-- Speed milestone achievement sounds
-
 ## Game Modes
 
 ### Speed Demon Mode
@@ -46,13 +25,6 @@ A browser-based racing game with two distinct game modes: pure speed racing and 
 - **Power-ups**: Health, shield, speed boost, multi-shot
 - **Speed Boosts**: +15 mph per milestone (balanced for combat)
 
-## Controls
-
-- **Movement**: WASD or Arrow Keys
-- **Shooting**: Space Bar (Tank Crusher mode only)
-- **Special Ability**: X key
-- **Menu Navigation**: Mouse clicks
-
 ## Technical Implementation
 
 ### Architecture
@@ -67,11 +39,6 @@ A browser-based racing game with two distinct game modes: pure speed racing and 
 - Memory-conscious object pooling for bullets/particles
 - Smooth animations with delta time calculations
 
-### Browser Compatibility
-- Modern browsers with HTML5 Canvas support
-- Web Audio API for sound effects
-- Responsive design for different screen sizes
-
 ## File Structure
 
 ```
@@ -83,32 +50,3 @@ racing-car-game/
 └── README.md           # Project documentation
 ```
 
-## Getting Started
-
-1. Clone or download the project files
-2. Open `index.html` in a modern web browser
-3. Select your preferred game mode
-4. Choose your car type
-5. Click "Start Game" to begin
-
-## Browser Requirements
-
-- HTML5 Canvas support
-- Web Audio API support
-- ES6 JavaScript features
-- Modern browser (Chrome 60+, Firefox 55+, Safari 11+)
-
-## Development
-
-The game is built with vanilla web technologies:
-
-- **HTML5**: Structure and canvas element
-- **CSS3**: Styling with animations and gradients
-- **JavaScript ES6**: Game logic and systems
-- **Web Audio API**: Procedural sound generation
-
-No build process or external dependencies required.
-
-## License
-
-This project is open source and available under the MIT License.
