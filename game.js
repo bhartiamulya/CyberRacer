@@ -13,24 +13,21 @@ class RacingGame {
         this.maxSpeed = 0;
         this.speedMilestones = [500, 1000, 2000, 3500, 5000, 7500, 10000];
         this.currentMilestone = 0;
-        this.gameMode = 'combat'; // 'speed', 'combat'
+        this.gameMode = 'combat'; 
         this.ammo = 30;
         this.maxAmmo = 30;
         this.reloadTime = 0;
-        this.maxReloadTime = 180; // 3 seconds
+        this.maxReloadTime = 180; 
         this.shootCooldown = 0;
         
-        // Audio system
         this.sounds = {};
         this.initAudio();
         
-        // Car types with different abilities
         this.carTypes = [
             { name: 'SPEED DEMON', color: '#ff4444', speed: 6, health: 80, special: 'speed_boost' },
             { name: 'TANK CRUSHER', color: '#44ff44', speed: 4, health: 150, special: 'shield' }
         ];
         
-        // Player car
         this.player = {
             x: this.canvas.width / 2 - 25,
             y: this.canvas.height - 120,
@@ -44,7 +41,6 @@ class RacingGame {
             specialCooldown: 0
         };
         
-        // Game objects
         this.enemies = [];
         this.bullets = [];
         this.enemyBullets = [];
@@ -52,24 +48,22 @@ class RacingGame {
         this.particles = [];
         this.explosions = [];
         
-        // Spawn rates
+       
         this.enemySpawnRate = 0.02;
         this.powerUpSpawnRate = 0.005;
         
-        // Road and background
         this.roadLines = [];
         this.stars = [];
         this.initRoadLines();
         this.initStars();
         
-        // Power-ups system
+       
         this.activePowerUps = new Map();
         
-        // Controls
+     
         this.keys = {};
         this.setupControls();
         
-        // Game loop
         this.lastTime = 0;
         this.animate = this.animate.bind(this);
     }
@@ -101,13 +95,12 @@ class RacingGame {
         document.addEventListener('keydown', (e) => {
             this.keys[e.key.toLowerCase()] = true;
             
-            // Shooting (only in combat mode)
             if (e.key === ' ' && this.gameRunning && this.gameMode === 'combat') {
                 e.preventDefault();
                 this.shoot();
             }
             
-            // Special ability (available in both modes)
+          
             if (e.key.toLowerCase() === 'x' && this.gameRunning) {
                 this.useSpecialAbility();
             }
@@ -117,7 +110,7 @@ class RacingGame {
             this.keys[e.key.toLowerCase()] = false;
         });
         
-        // Car selection
+       
         document.querySelectorAll('.car-btn').forEach((btn, index) => {
             btn.addEventListener('click', () => {
                 this.selectedCarType = index;
@@ -128,7 +121,7 @@ class RacingGame {
     }
     
     initAudio() {
-        // Create audio context
+        
         try {
             this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
             this.audioEnabled = true;
@@ -138,7 +131,7 @@ class RacingGame {
             return;
         }
         
-        // Create sound effects using oscillators
+       
         this.sounds = {
             shoot: () => this.playShootSound(),
             enemyShoot: () => this.playEnemyShootSound(),
@@ -157,7 +150,7 @@ class RacingGame {
         if (!this.audioEnabled || !this.audioContext) return;
         
         try {
-            // Resume audio context if suspended
+           
             if (this.audioContext.state === 'suspended') {
                 this.audioContext.resume();
             }
@@ -375,7 +368,7 @@ class RacingGame {
     }
     
     shoot() {
-        // Check if can shoot (ammo, cooldown, reload)
+        
         if (this.ammo <= 0 || this.shootCooldown > 0 || this.reloadTime > 0) {
             return;
         }
@@ -383,9 +376,9 @@ class RacingGame {
         const multishot = this.activePowerUps.has('multishot');
         const bulletCount = multishot ? 3 : 1;
         
-        // Use ammo
+       
         this.ammo--;
-        this.shootCooldown = 10; // Small cooldown between shots
+        this.shootCooldown = 10; 
         
         for (let i = 0; i < bulletCount; i++) {
             const offsetX = multishot ? (i - 1) * 20 : 0;
@@ -399,13 +392,13 @@ class RacingGame {
             });
         }
         
-        // Add muzzle flash particles
+        
         this.createParticles(this.player.x + this.player.width / 2, this.player.y, '#00ffff', 5);
         
-        // Play shoot sound
+       
         this.sounds.shoot();
         
-        // Start reload if out of ammo
+        
         if (this.ammo <= 0) {
             this.reloadTime = this.maxReloadTime;
             this.sounds.reload();
@@ -486,15 +479,15 @@ class RacingGame {
             this.speed = Math.max(this.speed - 0.5, 80);
         }
         
-        // Update game speed based on player speed
+        
         this.gameSpeed = 2 + (this.speed / 40);
         
-        // Track max speed
+       
         if (this.speed > this.maxSpeed) {
             this.maxSpeed = this.speed;
         }
         
-        // Check for speed milestones (much more frequent in speed mode)
+      
         const milestoneMultiplier = this.gameMode === 'speed' ? 0.3 : 1;
         if (this.currentMilestone < this.speedMilestones.length && 
             this.score >= this.speedMilestones[this.currentMilestone] * milestoneMultiplier) {
@@ -502,29 +495,29 @@ class RacingGame {
             this.currentMilestone++;
         }
         
-        // Additional continuous speed increase for speed mode
+      
         if (this.gameMode === 'speed' && Math.random() < 0.002) {
-            this.speed += 2; // Small continuous speed boosts
+            this.speed += 2; 
         }
         
-        // Update timers
+        
         if (this.player.invulnerable > 0) this.player.invulnerable--;
         if (this.player.specialCooldown > 0) this.player.specialCooldown--;
         if (this.comboTimer > 0) this.comboTimer--;
         else this.combo = 0;
         
-        // Update ammo system (only in combat mode)
+      
         if (this.gameMode === 'combat') {
             if (this.shootCooldown > 0) this.shootCooldown--;
             if (this.reloadTime > 0) {
                 this.reloadTime--;
                 if (this.reloadTime === 0) {
-                    this.ammo = this.maxAmmo; // Reload complete
+                    this.ammo = this.maxAmmo; 
                 }
             }
         }
         
-        // Create exhaust particles
+       
         if (Math.random() < 0.3) {
             this.createParticles(
                 this.player.x + this.player.width / 2,
@@ -536,17 +529,17 @@ class RacingGame {
     }
     
     increaseSpeed() {
-        // Different speed increases based on game mode
+      
         let speedIncrease = 15;
         let gameSpeedIncrease = 0.5;
         
         switch(this.gameMode) {
             case 'speed':
-                speedIncrease = 35; // Much bigger speed boosts in speed mode
+                speedIncrease = 35; 
                 gameSpeedIncrease = 1.2;
                 break;
             case 'combat':
-                speedIncrease = 15; // Moderate speed boosts in combat mode
+                speedIncrease = 15; 
                 gameSpeedIncrease = 0.5;
                 break;
         }
@@ -554,7 +547,7 @@ class RacingGame {
         this.speed += speedIncrease;
         this.gameSpeed += gameSpeedIncrease;
         
-        // Create speed boost particles
+       
         this.createParticles(
             this.player.x + this.player.width / 2,
             this.player.y + this.player.height / 2,
@@ -562,10 +555,10 @@ class RacingGame {
             30
         );
         
-        // Screen shake for speed boost
+       
         this.screenShake = 8;
         
-        // Play speed boost sound
+       
         this.sounds.speedBoost();
         
         console.log(`🚀 SPEED MILESTONE REACHED! Mode: ${this.gameMode.toUpperCase()} - Speed +${speedIncrease}!`);
@@ -575,12 +568,12 @@ class RacingGame {
         for (let i = this.enemies.length - 1; i >= 0; i--) {
             this.enemies[i].y += this.enemies[i].speed;
             
-            // Enemy shooting in combat mode
+            
             if (this.gameMode === 'combat' && Math.random() < 0.01 && this.enemies[i].y > 50) {
                 this.enemyShoot(this.enemies[i]);
             }
             
-            // Remove enemies that are off screen
+            
             if (this.enemies[i].y > this.canvas.height) {
                 this.enemies.splice(i, 1);
                 this.score += 5;
@@ -598,10 +591,10 @@ class RacingGame {
             color: '#ff4444'
         });
         
-        // Add muzzle flash for enemy
+      
         this.createParticles(enemy.x + enemy.width / 2, enemy.y + enemy.height, '#ff4444', 3);
         
-        // Play enemy shoot sound
+        
         this.sounds.enemyShoot();
     }
     
@@ -609,13 +602,13 @@ class RacingGame {
         for (let i = this.bullets.length - 1; i >= 0; i--) {
             this.bullets[i].y -= this.bullets[i].speed;
             
-            // Remove bullets that are off screen
+            
             if (this.bullets[i].y < 0) {
                 this.bullets.splice(i, 1);
                 continue;
             }
             
-            // Check bullet-enemy collisions
+           
             for (let j = this.enemies.length - 1; j >= 0; j--) {
                 if (this.bullets[i] && 
                     this.bullets[i].x < this.enemies[j].x + this.enemies[j].width &&
@@ -623,12 +616,12 @@ class RacingGame {
                     this.bullets[i].y < this.enemies[j].y + this.enemies[j].height &&
                     this.bullets[i].y + this.bullets[i].height > this.enemies[j].y) {
                     
-                    // Damage enemy
+                   
                     this.enemies[j].health--;
                     this.bullets.splice(i, 1);
                     
                     if (this.enemies[j].health <= 0) {
-                        // Enemy destroyed
+                        
                         this.createExplosion(
                             this.enemies[j].x + this.enemies[j].width / 2,
                             this.enemies[j].y + this.enemies[j].height / 2
@@ -639,7 +632,7 @@ class RacingGame {
                         this.comboTimer = 180; // 3 seconds
                         this.enemies.splice(j, 1);
                     } else {
-                        // Enemy damaged
+                      
                         this.createParticles(
                             this.enemies[j].x + this.enemies[j].width / 2,
                             this.enemies[j].y + this.enemies[j].height / 2,
@@ -657,19 +650,19 @@ class RacingGame {
         for (let i = this.enemyBullets.length - 1; i >= 0; i--) {
             this.enemyBullets[i].y += this.enemyBullets[i].speed;
             
-            // Remove bullets that are off screen
+            
             if (this.enemyBullets[i].y > this.canvas.height) {
                 this.enemyBullets.splice(i, 1);
                 continue;
             }
             
-            // Check enemy bullet-player collisions
+           
             if (this.enemyBullets[i].x < this.player.x + this.player.width &&
                 this.enemyBullets[i].x + this.enemyBullets[i].width > this.player.x &&
                 this.enemyBullets[i].y < this.player.y + this.player.height &&
                 this.enemyBullets[i].y + this.enemyBullets[i].height > this.player.y) {
                 
-                // Player hit by enemy bullet
+               
                 if (this.player.invulnerable <= 0) {
                     this.player.health -= 15;
                     this.player.invulnerable = 60; // 1 second
@@ -696,14 +689,13 @@ class RacingGame {
     updatePowerUps() {
         for (let i = this.powerUps.length - 1; i >= 0; i--) {
             this.powerUps[i].y += this.powerUps[i].speed;
-            
-            // Remove power-ups that are off screen
+           
             if (this.powerUps[i].y > this.canvas.height) {
                 this.powerUps.splice(i, 1);
                 continue;
             }
             
-            // Check power-up collection
+           
             if (this.powerUps[i].x < this.player.x + this.player.width &&
                 this.powerUps[i].x + this.powerUps[i].width > this.player.x &&
                 this.powerUps[i].y < this.player.y + this.player.height &&
@@ -795,7 +787,6 @@ class RacingGame {
                 this.player.y < enemy.y + enemy.height &&
                 this.player.y + this.player.height > enemy.y) {
                 
-                // Damage player
                 this.player.health -= 25;
                 this.player.invulnerable = 120; // 2 seconds
                 this.createExplosion(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
@@ -821,7 +812,6 @@ class RacingGame {
     }
     
     drawRoad() {
-        // Road background with gradient
         const gradient = this.ctx.createLinearGradient(100, 0, this.canvas.width - 100, 0);
         gradient.addColorStop(0, '#333');
         gradient.addColorStop(0.5, '#555');
@@ -829,7 +819,7 @@ class RacingGame {
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(100, 0, this.canvas.width - 200, this.canvas.height);
         
-        // Road edges with glow
+      
         this.ctx.shadowColor = '#00ffff';
         this.ctx.shadowBlur = 10;
         this.ctx.fillStyle = '#00ffff';
@@ -837,7 +827,7 @@ class RacingGame {
         this.ctx.fillRect(this.canvas.width - 105, 0, 10, this.canvas.height);
         this.ctx.shadowBlur = 0;
         
-        // Road lines with glow
+       
         this.ctx.shadowColor = '#ffffff';
         this.ctx.shadowBlur = 5;
         this.ctx.fillStyle = '#ffffff';
@@ -850,38 +840,34 @@ class RacingGame {
     drawCar(car, isPlayer = false) {
         this.ctx.save();
         
-        // Invulnerability flashing effect
+      
         if (isPlayer && this.player.invulnerable > 0 && Math.floor(this.player.invulnerable / 5) % 2) {
             this.ctx.globalAlpha = 0.5;
         }
         
-        // Shield effect
+        
         if (isPlayer && this.player.invulnerable > 0) {
             this.ctx.shadowColor = '#0088ff';
             this.ctx.shadowBlur = 15;
         }
-        
-        // Car body with gradient
+      
         const gradient = this.ctx.createLinearGradient(car.x, car.y, car.x, car.y + car.height);
         gradient.addColorStop(0, car.color);
         gradient.addColorStop(0.5, this.lightenColor(car.color, 20));
         gradient.addColorStop(1, this.darkenColor(car.color, 20));
         this.ctx.fillStyle = gradient;
         this.ctx.fillRect(car.x, car.y, car.width, car.height);
-        
-        // Car details
+      
         this.ctx.fillStyle = '#111';
         this.ctx.fillRect(car.x + 5, car.y + 10, car.width - 10, 15);
         this.ctx.fillRect(car.x + 5, car.y + car.height - 25, car.width - 10, 15);
-        
-        // Wheels with metallic effect
+       
         this.ctx.fillStyle = '#333';
         this.ctx.fillRect(car.x - 3, car.y + 15, 8, 12);
         this.ctx.fillRect(car.x + car.width - 5, car.y + 15, 8, 12);
         this.ctx.fillRect(car.x - 3, car.y + car.height - 27, 8, 12);
         this.ctx.fillRect(car.x + car.width - 5, car.y + car.height - 27, 8, 12);
-        
-        // Health bar for enemies
+       
         if (!isPlayer && car.health < car.maxHealth) {
             const barWidth = car.width;
             const barHeight = 4;
@@ -943,8 +929,7 @@ class RacingGame {
             this.ctx.shadowBlur = 15;
             this.ctx.fillStyle = powerUp.color;
             this.ctx.fillRect(powerUp.x, powerUp.y, powerUp.width, powerUp.height);
-            
-            // Draw symbol
+           
             this.ctx.fillStyle = '#ffffff';
             this.ctx.font = '16px Arial';
             this.ctx.textAlign = 'center';
@@ -988,7 +973,6 @@ class RacingGame {
     draw() {
         this.ctx.save();
         
-        // Screen shake effect
         if (this.screenShake > 0) {
             this.ctx.translate(
                 (Math.random() - 0.5) * this.screenShake,
@@ -997,40 +981,34 @@ class RacingGame {
             this.screenShake--;
         }
         
-        // Clear canvas with gradient background
+       
         const bgGradient = this.ctx.createLinearGradient(0, 0, 0, this.canvas.height);
         bgGradient.addColorStop(0, '#001122');
         bgGradient.addColorStop(0.5, '#002244');
         bgGradient.addColorStop(1, '#001122');
         this.ctx.fillStyle = bgGradient;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Draw stars
+       
         this.drawStars();
-        
-        // Draw road
+      
         this.drawRoad();
-        
-        // Draw game objects
+     
         this.drawParticles();
         this.drawExplosions();
-        
-        // Only draw combat elements in combat mode
+     
         if (this.gameMode === 'combat') {
             this.drawBullets();
             this.drawEnemyBullets();
             this.drawPowerUps();
         }
-        
-        // Draw cars
+     
         this.drawCar(this.player, true);
         for (let enemy of this.enemies) {
             this.drawCar(enemy, false);
         }
         
         this.ctx.restore();
-        
-        // Update UI
+      
         this.updateUI();
     }
     
@@ -1038,17 +1016,14 @@ class RacingGame {
         document.getElementById('score').textContent = this.score + (this.combo > 1 ? ` (+${this.combo}x)` : '');
         document.getElementById('speed').textContent = Math.floor(this.speed);
         document.getElementById('combo').textContent = this.combo;
-        
-        // Update health bar
+      
         const healthPercent = (this.player.health / this.player.maxHealth) * 100;
         document.getElementById('healthFill').style.width = healthPercent + '%';
         
-        // Update combat-related UI only in combat mode
         if (this.gameMode === 'combat') {
-            // Show weapon info in combat mode
+           
             document.querySelector('.weapon-info').style.display = 'block';
             
-            // Update weapon type and ammo
             const weaponType = this.activePowerUps.has('multishot') ? 'TRIPLE SHOT' : 'BLASTER';
             let ammoText = '';
             if (this.reloadTime > 0) {
@@ -1059,7 +1034,6 @@ class RacingGame {
             document.getElementById('weaponType').textContent = weaponType;
             document.querySelector('.ammo').textContent = ammoText;
             
-            // Update power-ups display
             const powerUpsContainer = document.getElementById('powerUps');
             powerUpsContainer.innerHTML = '';
             
@@ -1087,7 +1061,7 @@ class RacingGame {
                 powerUpsContainer.appendChild(powerUpDiv);
             }
         } else {
-            // In speed mode, hide combat UI elements completely
+          
             document.querySelector('.weapon-info').style.display = 'none';
             document.getElementById('powerUps').innerHTML = '';
         }
@@ -1098,7 +1072,6 @@ class RacingGame {
         
         this.spawnEnemy();
         
-        // Only spawn power-ups and update bullets in combat mode
         if (this.gameMode === 'combat') {
             this.spawnPowerUp();
             this.updateBullets();
@@ -1115,12 +1088,11 @@ class RacingGame {
         this.updateStars();
         this.checkCollisions();
         
-        // Increase difficulty over time (different scaling for each mode)
         if (this.gameMode === 'speed') {
-            // Speed mode: faster enemy spawning, focus on dodging
+          
             this.enemySpawnRate = Math.min(0.12, 0.03 + (this.score / 2000));
         } else if (this.gameMode === 'combat') {
-            // Combat mode: balanced enemy spawning with power-ups
+           
             this.enemySpawnRate = Math.min(0.08, 0.02 + (this.score / 3000));
             this.powerUpSpawnRate = Math.min(0.01, 0.005 + (this.score / 10000));
         }
@@ -1148,8 +1120,7 @@ class RacingGame {
         this.screenShake = 0;
         this.maxSpeed = 80;
         this.currentMilestone = 0;
-        
-        // Reset arrays
+    
         this.enemies = [];
         this.bullets = [];
         this.enemyBullets = [];
@@ -1158,16 +1129,13 @@ class RacingGame {
         this.explosions = [];
         this.activePowerUps.clear();
         
-        // Reset ammo system
         this.ammo = this.maxAmmo;
         this.reloadTime = 0;
         this.shootCooldown = 0;
-        
-        // Reset spawn rates
+      
         this.enemySpawnRate = 0.02;
         this.powerUpSpawnRate = 0.005;
-        
-        // Setup player based on selected car type
+     
         const carType = this.carTypes[this.selectedCarType];
         this.player = {
             x: this.canvas.width / 2 - 25,
@@ -1181,17 +1149,14 @@ class RacingGame {
             invulnerable: 0,
             specialCooldown: 0
         };
-        
-        // Hide menu screens and show HUD
+    
         document.getElementById('startScreen').classList.add('hidden');
         document.getElementById('gameOver').classList.add('hidden');
         document.querySelector('.hud-top').style.display = 'flex';
         document.querySelector('.hud-bottom').style.display = 'flex';
         
-        // Add screen shake effect for game start
         this.screenShake = 5;
         
-        // Test audio system
         if (this.audioEnabled && this.audioContext) {
             console.log('Testing audio system...');
             setTimeout(() => {
@@ -1204,17 +1169,14 @@ class RacingGame {
     
     gameOver() {
         this.gameRunning = false;
-        
-        // Create final explosion
+      
         this.createExplosion(this.player.x + this.player.width / 2, this.player.y + this.player.height / 2);
         this.screenShake = 20;
         this.sounds.explosion();
         
-        // Hide HUD elements
         document.querySelector('.hud-top').style.display = 'none';
         document.querySelector('.hud-bottom').style.display = 'none';
         
-        // Add screen shake to game container
         document.querySelector('.game-container').classList.add('screen-shake');
         setTimeout(() => {
             document.querySelector('.game-container').classList.remove('screen-shake');
@@ -1226,12 +1188,10 @@ class RacingGame {
     }
 }
 
-// Initialize game
 const game = new RacingGame();
 
-// Global functions for buttons
 function startGame() {
-    // Initialize and resume audio context if needed (browser requirement)
+  
     if (game.audioContext) {
         if (game.audioContext.state === 'suspended') {
             game.audioContext.resume().then(() => {
@@ -1257,22 +1217,19 @@ function showGameMenu() {
 function backToRacing() {
     document.getElementById('gameMenu').classList.add('hidden');
     document.getElementById('startScreen').classList.remove('hidden');
-    
-    // Ensure HUD is hidden when going back to start screen
+   
     document.querySelector('.hud-top').style.display = 'none';
     document.querySelector('.hud-bottom').style.display = 'none';
 }
 
 function selectGameMode(mode) {
-    // Remove active class from all cards
+   
     document.querySelectorAll('.game-card').forEach(card => {
         card.classList.remove('active');
     });
     
-    // Add active class to selected card
     event.target.closest('.game-card').classList.add('active');
     
-    // Set game mode and corresponding car type
     switch(mode) {
         case 'speed':
             game.gameMode = 'speed';
@@ -1287,7 +1244,6 @@ function selectGameMode(mode) {
             return;
     }
     
-    // Update car selection on start screen
     document.querySelectorAll('.car-btn').forEach((btn, index) => {
         btn.classList.remove('active');
         if (index === game.selectedCarType) {
@@ -1295,21 +1251,17 @@ function selectGameMode(mode) {
         }
     });
     
-    // Go to start screen and hide HUD
     document.getElementById('gameMenu').classList.add('hidden');
     document.getElementById('startScreen').classList.remove('hidden');
     
-    // Ensure HUD is hidden when going to start screen
     document.querySelector('.hud-top').style.display = 'none';
     document.querySelector('.hud-bottom').style.display = 'none';
 }
 
-// Show start screen initially and hide HUD
 document.getElementById('startScreen').classList.remove('hidden');
 document.getElementById('gameMenu').classList.add('hidden');
 document.getElementById('gameOver').classList.add('hidden');
 
-// Ensure HUD is hidden initially
 if (document.querySelector('.hud-top')) {
     document.querySelector('.hud-top').style.display = 'none';
 }
